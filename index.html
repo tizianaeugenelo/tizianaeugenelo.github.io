@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Tiziana Eugenelo, master's student in mathematics at the University of Padova and the Galilean School. Geometric analysis and geometric measure theory.">
+<title>Tiziana Eugenelo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+.intro{grid-template-columns:1fr 240px}
+.photo{width:240px}
+.me{margin:0;display:grid;gap:6px}
+.me figcaption{font:400 .8rem var(--sans);color:var(--muted);text-align:center}
+@media (max-width:600px){.intro{grid-template-columns:1fr}.photo{width:100%;max-width:320px}.me figcaption{text-align:left}}
+</style>
+</head>
+<body>
+<nav aria-label="Pages">
+  <div class="in">
+    <a class="name" href="index.html" style="color:var(--ink)">Tiziana Eugenelo</a>
+    <a href="index.html" class="on" aria-current="page">About</a>
+    <a href="projects.html">Projects</a>
+    <a href="cv.html">CV</a>
+    <a href="passions.html">Other passions</a>
+  </div>
+</nav>
+
+<main>
+  <section id="about" aria-label="About">
+    <div class="intro">
+      <div>
+        <h1>Tiziana Eugenelo</h1>
+        <p class="role">Master's student in Mathematics, University of Padova<br>Galilean School of Higher Education</p>
+        <p>I am very invested in geometric analysis, geometric measure theory, calculus of variations and PDEs (especially regularity!). I am currently studying curvature estimates for stable minimal hypersurfaces and Bernstein-type theorems. I am applying to PhD programs starting in Fall 2027.</p>
+        <p class="role">If you would like to talk mathematics, I would love to hear from you: write to me at <a href="mailto:tiziana.eugenelo@gmail.com" class="mail">tiziana.eugenelo@gmail.com</a>.</p>
+      </div>
+      <div class="fig">
+        <figure class="me"><img class="photo" src="tiziana.jpg" alt="Tiziana Eugenelo sitting on a pier by a lake in Jyväskylä" width="900" height="1200"><figcaption>In Jyväskylä</figcaption></figure>
+      </div>
+    </div>
+    <div class="interests">
+      <div>
+        <h3>Research interests</h3>
+        <div class="chips"><span>Minimal surfaces</span><span>Geometric measure theory</span><span>Calculus of variations</span><span>Regularity theory</span><span>Elliptic PDE</span></div>
+      </div>
+      <canvas id="catenoid" width="240" height="240" role="img" aria-label="Rotating wireframe of a catenoid, a minimal surface of revolution"></canvas>
+    </div>
+    <div class="block">
+      <h3>Personal information</h3>
+      <dl class="facts">
+        <dt>Email</dt><dd><span id="email">tiziana.eugenelo@gmail.com</span><button class="copy" id="copy" type="button">Copy</button></dd>
+        <dt>Based in</dt><dd>Padova, Italy (from Foggia)</dd>
+        <dt>Languages</dt><dd>Italian (native), English (fluent), French (A2)</dd>
+        <dt>Affiliation</dt><dd>Department of Mathematics "Tullio Levi-Civita", University of Padova</dd>
+      </dl>
+    </div>
+    <div class="explore">
+      <a href="projects.html">Projects →</a>
+      <a href="cv.html">CV →</a>
+      <a href="passions.html">Other passions →</a>
+    </div>
+  </section>
+</main>
+
+<footer><div>Updated September 2026 · Stage photo: Samuele Romano</div></footer>
+<script>
+(function(){
+  var btn=document.getElementById('copy');
+  btn.addEventListener('click',function(){
+    var t=document.getElementById('email').textContent;
+    function sel(){var r=document.createRange();r.selectNodeContents(document.getElementById('email'));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selected';}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){btn.textContent='Copied';},sel);}else sel();
+    setTimeout(function(){btn.textContent='Copy';},1800);
+  });
+})();
+(function(){
+  var c=document.getElementById('catenoid'); if(!c) return;
+  var ctx=c.getContext('2d'), W=c.width, H=c.height;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function colors(){var s=getComputedStyle(document.documentElement);var g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0.08,s.getPropertyValue('--cat-a').trim()||'#6a3fb0');g.addColorStop(0.92,s.getPropertyValue('--cat-b').trim()||'#c99a06');return g;}
+  var col=colors();
+  var V=1.25, scale=W/(2*Math.cosh(V)*1.15);
+  function proj(u,v,a){
+    var x=Math.cosh(v)*Math.cos(u), y=Math.cosh(v)*Math.sin(u), z=v;
+    var xr=x*Math.cos(a)-y*Math.sin(a), yr=x*Math.sin(a)+y*Math.cos(a);
+    var tilt=0.42, zr=z*Math.cos(tilt)-yr*Math.sin(tilt), depth=z*Math.sin(tilt)+yr*Math.cos(tilt);
+    return [W/2+xr*scale, H/2-zr*scale*1.05, depth];
+  }
+  function line(pts){ctx.beginPath();pts.forEach(function(p,i){i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]);});ctx.stroke();}
+  function draw(a){
+    col=colors();
+    ctx.clearRect(0,0,W,H); ctx.lineWidth=1.9; ctx.strokeStyle=col;
+    var i,j,pts;
+    for(i=0;i<=10;i++){var v=-V+2*V*i/10;pts=[];for(j=0;j<=72;j++)pts.push(proj(2*Math.PI*j/72,v,a));ctx.globalAlpha=0.9;line(pts);}
+    for(i=0;i<24;i++){var u=2*Math.PI*i/24;pts=[];for(j=0;j<=30;j++)pts.push(proj(u,-V+2*V*j/30,a));var d=proj(u,0,a)[2];ctx.globalAlpha=d>0?0.35:0.95;line(pts);}
+    ctx.globalAlpha=1;
+  }
+  if(reduce){draw(0.6);return;}
+  var a=0.6; function tick(){a+=0.0035;draw(a);requestAnimationFrame(tick);} tick();
+})();</script>
+</body>
+</html>
